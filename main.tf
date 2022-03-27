@@ -6,11 +6,17 @@ terraform {
     }
   }
   required_version = ">= 1.1.0"
+  cloud {
+    organization = "elasticplayground"
+    workspaces {
+      name = "learn-terraform-drift-management"
+    }
+  }
 }
 
 provider "aws" {
   region = var.region
-  default_tags = {
+  default_tags {
     tags = {
       environment = "lab"
     }
