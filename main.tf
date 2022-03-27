@@ -5,11 +5,16 @@ terraform {
       version = ">= 3.24.1"
     }
   }
-  required_version = ">= 0.15"
+  required_version = ">= 1.1.0"
 }
 
 provider "aws" {
   region = var.region
+  default_tags = {
+    tags = {
+      environment = "lab"
+    }
+  }
 }
 
 data "aws_ami" "ubuntu" {
@@ -30,7 +35,7 @@ data "aws_ami" "ubuntu" {
 
 resource "aws_key_pair" "deployer" {
   key_name   = "deployer-key"
-  public_key = file("${path.module}/key.pub")
+  public_key = var.ssh_public_key_data
 }
 
 resource "aws_instance" "example" {
@@ -58,7 +63,7 @@ resource "aws_security_group" "sg_ssh" {
     from_port   = "22"
     to_port     = "22"
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.whitelist_cidrs]
   }
   // connectivity to ubuntu mirrors is required to run `apt-get update` and `apt-get install apache2`
   egress {
